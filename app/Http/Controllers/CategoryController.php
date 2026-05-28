@@ -9,9 +9,9 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $category = Category::latest()->get();
+        $categories = Category::all();
 
-        return view('administrator.categoriesAdm', compact('category'));
+        return view('administrator.menuAdm', compact('categories'));
     }
 
     public function store(Request $request)

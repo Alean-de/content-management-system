@@ -9,7 +9,6 @@
 <body>
     <form method="POST" action="{{ route('auth.login') }}">
         @csrf
-        
         <div>
             <label for="identity">Email atau Username</label>
             <input type="text" id="identity" name="identity" required>
