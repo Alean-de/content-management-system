@@ -1,6 +1,6 @@
 @include('partials.head')
 
-<form action="{{ route('administrator.menu.store') }}" method="POST" enctype="multipart/form-data">
+<form method="POST" id="formTambahMenu" enctype="multipart/form-data">
     @csrf
     <div>
         <label for="image">Image</label>
@@ -52,61 +52,8 @@
             <th>Aksi</th>
         </tr>
     </thead>
-    <tbody>
-        @forelse ($menuItems as $key => $item)
-            <tr>
-                <td>{{ $key + 1 }}</td> 
-
-                <td>
-                    @if($item->image)
-                        <img src="{{ asset('storage/' . $item->image) }}" 
-                            alt="{{ $item->name }}" 
-                            style="width: 100px; height: auto; object-fit: cover;" 
-                            class="img-thumbnail">
-                    @else
-                        <img src="{{ asset('images/no-image.png') }}" 
-                            alt="No Image" 
-                            style="width: 100px; height: auto;" 
-                            class="img-thumbnail">
-                    @endif
-                </td>
-
-                
-                <td>{{ $item->name }}</td> 
-
-                <td>{{ $item->description }}</td>
-                
-                <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td> 
-                
-                <td>
-                    {{ $item->category ? $item->category->category_name : 'Tanpa Kategori' }}
-                </td>
-                
-                <td>{{ $item->created_at->format('d M Y') }}</td>
-
-                <td class="text-center">
-                    <div class="d-flex justify-content-center gap-2">
-                        
-                        <a href="{{ route('administrator.menu.showUpdate', $item->id) }}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-
-                        <form action="{{ route('administrator.menu.delete', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus menu ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete-btn">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </form>
-
-                    </div>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="5" class="text-center">Belum ada data menu.</td>
-            </tr>
-        @endforelse
+    <tbody id="menuTableBody">
+       
     </tbody>
 </table>
 

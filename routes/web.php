@@ -31,10 +31,11 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
     Route::prefix('menu')->name('menu.')->group(function () {
         Route::get('/', [MenuController::class, 'index']);
         Route::get('/update/{menuItem}', [MenuController::class, 'showUpdate'])->name('showUpdate');
-        Route::get('api/menu/', [MenuController::class, 'jsonMenu']);
+        Route::get('api/menu/', [MenuController::class, 'index'])->name('index');
+        Route::post('/api/menu', [MenuController::class, 'store'])->name('api.store');
         Route::post('/create', [MenuController::class, 'store'])->name('store');
         Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
-        Route::delete('/delete/{menuItem}', [MenuController::class, 'delete'])->name('delete');
+        Route::delete('/delete/{menuItems}', [MenuController::class, 'delete'])->name('delete');
     }); 
 
     Route::prefix('article')->name('article.')->group(function () {
@@ -49,7 +50,6 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
     Route::prefix('banner')->name('banner.')->group(function () {
         Route::get('/', [BannerController::class, 'index']);
         Route::get('/update/{banner}', [BannerController::class, 'showUpdate'])->name('showUpdate');
-        Route::get('/api/banner', [BannerController::class, 'jsonBanner']);
         Route::post('/create', [BannerController::class, 'store'])->name('store');
         Route::put('/update/{banner}', [BannerController::class, 'updateBanner'])->name('update');
         Route::delete('/delete/{banner}', [BannerController::class, 'delete'])->name('delete');

@@ -9,14 +9,18 @@ use App\Models\Banner;
 
 class BannerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-         $banners = Banner::latest()->get();
+        $banners = Banner::latest()->get();
 
-        return view(
-            'administrator.bannerAdmn',
-            compact('banners')  
-        );
+       if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $banners
+            ]);
+        }
+
+        return view('administrator.bannerAdmn', compact('banners'));
     }
 
     public function store(Request $request)
@@ -30,10 +34,8 @@ class BannerController extends Controller
         ]);
 
         $imagePath = null;
-
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')
-                ->store('banners', 'public');
+            $imagePath = $request->file('image')->store('banners', 'public');
         }
 
         Banner::create([
@@ -45,7 +47,10 @@ class BannerController extends Controller
             'end_date' => $request->end_date,
         ]);
 
-        return back()->with('success', 'Banner berhasil ditambahkan');
+        return response()->json([
+            'success' => true,
+            'message' => 'Banner berhasil ditambahkan!'
+        ]);
     }
 
     public function showUpdate(Banner $banner)
@@ -96,24 +101,15 @@ class BannerController extends Controller
     public function delete(Banner $banner)
     {
         if ($banner->image) {
-
-        Storage::disk('public')
-            ->delete($banner->image);
+            Storage::disk('public')->delete($banner->image);
         }
 
         $banner->delete();
 
-        return back()->with(
-            'success',
-            'Banner berhasil dihapus'
-        );
-    }
-
-    public function jsonBanner()
-    {
         return response()->json([
             'success' => true,
-            'data' => Banner::all()
+            'message' => 'Banner berhasil dihapus!'
         ]);
     }
+
 }

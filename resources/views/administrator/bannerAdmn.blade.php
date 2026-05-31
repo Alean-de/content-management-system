@@ -2,14 +2,9 @@
 
 <h2>Banner Management</h2>
 
-@if(session('success'))
-    <p>{{ session('success') }}</p>
-@endif
+<div id="alert-container"></div>
 
-<form action="{{ route('administrator.banner.store') }}"
-      method="POST"
-      enctype="multipart/form-data">
-
+<form id="formTambahBanner" enctype="multipart/form-data">
     @csrf
 
     <div>
@@ -40,7 +35,7 @@
 
     <div>
         <label>
-            <input type="checkbox" name="is_active">
+            <input type="checkbox" name="is_active" value="1">
             Active
         </label>
     </div>
@@ -65,70 +60,8 @@
         </tr>
     </thead>
 
-    <tbody>
-
-        @forelse($banners as $index => $banner)
-            <tr>
-
-                <td>{{ $index + 1 }}</td>
-
-                <td>
-                    @if($banner->image)
-                        <img
-                            src="{{ asset('storage/' . $banner->image) }}"
-                            alt="{{ $banner->title }}"
-                            width="120">
-                    @else
-                        No Image
-                    @endif
-                </td>
-
-                <td>{{ $banner->title }}</td>
-
-                <td>{{ $banner->subtitle }}</td>
-
-                <td>
-                    {{ $banner->is_active ? 'Active' : 'Inactive' }}
-                </td>
-
-                <td>{{ $banner->start_date }}</td>
-
-                <td>{{ $banner->end_date }}</td>
-
-                <td>
-
-                    <a href="{{ route('administrator.banner.showUpdate', $banner->id) }}">
-                        Edit
-                    </a>
-
-                    <form action="{{ route('administrator.banner.delete', $banner->id) }}"
-                          method="POST"
-                          style="display:inline;">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button type="submit" class="delete-btn">
-                            Delete
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-                <td colspan="8">
-                    Belum ada banner
-                </td>
-            </tr>
-
-        @endforelse
-
-    </tbody>
+    <tbody id="bannerTableBody">
+        </tbody>
 </table>
 
 <script src="{{ asset('js/global.js') }}"></script>

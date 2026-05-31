@@ -8,14 +8,18 @@ use App\Models\Gallery;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $galleries = Gallery::latest()->get();
 
-        return view(
-            'administrator.galleryAdm',
-            compact('galleries')
-        );
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $galleries
+            ]);
+        }
+
+        return view('administrator.galleryAdm', compact('galleries'));
     }
 
     public function store(Request $request)
@@ -25,32 +29,30 @@ class GalleryController extends Controller
             'image' => ['required', 'image']
         ]);
 
-        $imagePath = $request->file('image')
-            ->store('gallery', 'public');
+        $imagePath = $request->file('image')->store('gallery', 'public');
 
         Gallery::create([
             'title' => $request->title,
             'image' => $imagePath
         ]);
 
-        return back()->with(
-            'success',
-            'Foto berhasil ditambahkan'
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto berhasil ditambahkan ke galeri!'
+        ]);
     }
 
     public function delete(Gallery $gallery)
     {
         if ($gallery->image) {
-            Storage::disk('public')
-                ->delete($gallery->image);
+            Storage::disk('public')->delete($gallery->image);
         }
 
         $gallery->delete();
 
-        return back()->with(
-            'success',
-            'Foto berhasil dihapus'
-        );
+       return response()->json([
+            'success' => true,
+            'message' => 'Foto berhasil dihapus dari galeri!'
+        ]);
     }
 }

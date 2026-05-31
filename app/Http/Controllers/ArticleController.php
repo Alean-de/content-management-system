@@ -10,16 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $articles = Article::with('user')
-            ->latest()
-            ->get();
+       $articles = Article::with('user')->latest()->get();
  
-        return view(
-            'administrator.articleAdm',
-            compact('articles')
-        );
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $articles
+            ]);
+        }
+
+        return view('administrator.articleAdm', compact('articles'));
     }
 
     public function store(Request $request)
@@ -31,12 +33,8 @@ class ArticleController extends Controller
         ]);
 
         $thumbnailPath = null;
-
         if ($request->hasFile('thumbnail')) {
-
-            $thumbnailPath = $request->file('thumbnail')
-                ->store('articles', 'public');
-
+            $thumbnailPath = $request->file('thumbnail')->store('articles', 'public');
         }
 
         Article::create([
@@ -48,10 +46,10 @@ class ArticleController extends Controller
             'published_at' => now()
         ]);
 
-        return back()->with(
-            'success',
-            'Article berhasil ditambahkan'
-        );
+       return response()->json([
+            'success' => true,
+            'message' => 'Article berhasil ditambahkan!'
+        ]);
     }
 
     public function showUpdate(Article $article)
@@ -96,25 +94,15 @@ class ArticleController extends Controller
     public function delete(Article $article)
     {
         if ($article->thumbnail) {
-
-            Storage::disk('public')
-                ->delete($article->thumbnail);
-
+            Storage::disk('public')->delete($article->thumbnail);
         }
 
         $article->delete();
 
-        return back()->with(
-            'success',
-            'Article berhasil dihapus'
-        );
-    }
-
-    public function jsonArticle()
-    {
         return response()->json([
             'success' => true,
-            'data' => Article::all()
+            'message' => 'Article berhasil dihapus tanpa sisa!'
         ]);
     }
+
 }

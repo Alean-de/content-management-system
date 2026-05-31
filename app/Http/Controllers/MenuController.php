@@ -9,19 +9,23 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $menuItems = Menu::with('category')
             ->latest()
             ->get();
         
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'data' => $menuItems
+            ]);
+        }
+
         $categories = Category::all();
 
-        return view(
-            'administrator.menuAdm',
-            compact('menuItems', 'categories')
-        );
+        return view('administrator.menuAdm', compact('menuItems', 'categories'));
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -105,27 +109,19 @@ class MenuController extends Controller
             ->with('success', 'Menu berhasil diupdate');
     }
 
-    public function delete(Menu $menuItem)
+    public function delete(Menu $menuItems)
     {
-        if ($menuItem->image) {
 
-        Storage::disk('public')
-            ->delete($menuItem->image);
+        if ($menuItems->image && Storage::disk('public')->exists($menuItems->image)) {
+            Storage::disk('public')->delete($menuItems->image);
         }
 
-        $menuItem->delete();
+        $menuItems->delete();
 
-        return back()->with(
-            'success',
-            'Menu Berhasil Disimpan'
-        );
-    }
-
-    public function jsonMenu()
-    {
         return response()->json([
             'success' => true,
-            'data' => Menu::all()
+            'message' => 'Menu Berhasil Dihapus'
         ]);
     }
+
 }
