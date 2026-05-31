@@ -108,4 +108,12 @@ class BannerController extends Controller
             'Banner berhasil dihapus'
         );
     }
+
+    public function jsonBanner()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => Banner::all()
+        ]);
+    }
 }

@@ -109,4 +109,12 @@ class ArticleController extends Controller
             'Article berhasil dihapus'
         );
     }
+
+    public function jsonArticle()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => Article::all()
+        ]);
+    }
 }

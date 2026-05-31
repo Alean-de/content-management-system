@@ -17,7 +17,7 @@ Route::prefix('administrator')->middleware('guest')->group(function (){
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
-    Route::get('/register', [AuthController::class, 'showRegister']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
     Route::get('/forgot_password', [AuthController::class, 'showForgot']);
@@ -31,6 +31,7 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
     Route::prefix('menu')->name('menu.')->group(function () {
         Route::get('/', [MenuController::class, 'index']);
         Route::get('/update/{menuItem}', [MenuController::class, 'showUpdate'])->name('showUpdate');
+        Route::get('api/menu/', [MenuController::class, 'jsonMenu']);
         Route::post('/create', [MenuController::class, 'store'])->name('store');
         Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
         Route::delete('/delete/{menuItem}', [MenuController::class, 'delete'])->name('delete');
@@ -39,6 +40,7 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
     Route::prefix('article')->name('article.')->group(function () {
         Route::get('/', [ArticleController::class, 'index']);
         Route::get('/update/{article}', [ArticleController::class, 'showUpdate'])->name('showUpdate');
+        Route::get('/api/article', [ArticleController::class, 'jsonArticle']);
         Route::post('/create', [ArticleController::class, 'store'])->name('store');
         Route::put('/update/{article}', [ArticleController::class, 'updateArticle'])->name('update');
         Route::delete('/delete/{article}', [ArticleController::class, 'delete'])->name('delete');
@@ -47,6 +49,7 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
     Route::prefix('banner')->name('banner.')->group(function () {
         Route::get('/', [BannerController::class, 'index']);
         Route::get('/update/{banner}', [BannerController::class, 'showUpdate'])->name('showUpdate');
+        Route::get('/api/banner', [BannerController::class, 'jsonBanner']);
         Route::post('/create', [BannerController::class, 'store'])->name('store');
         Route::put('/update/{banner}', [BannerController::class, 'updateBanner'])->name('update');
         Route::delete('/delete/{banner}', [BannerController::class, 'delete'])->name('delete');

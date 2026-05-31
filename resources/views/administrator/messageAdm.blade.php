@@ -47,8 +47,7 @@
                         @csrf
                         @method('DELETE')
 
-                        <button type="submit"
-                                onclick="return confirm('Yakin hapus pesan ini?')">
+                        <button type="submit" class="delete-btn">
                             Delete
                         </button>
 
@@ -72,4 +71,6 @@
 
 </table>
 
+<script src="{{ asset('js/global.js') }}"></script>
+<script src="{{ asset('js/global.js') }}"></script>
 @include('partials.foot')

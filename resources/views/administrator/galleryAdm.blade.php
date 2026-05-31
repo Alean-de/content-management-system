@@ -1,3 +1,5 @@
+@include('partials.head')
+
 <form action="{{ route('administrator.gallery.store') }}"
       method="POST"
       enctype="multipart/form-data">
@@ -11,7 +13,8 @@
 
     <div>
         <label>Image</label>
-        <input type="file" name="image" required>
+        <input type="file" name="image" id="gallery-image" required>
+        <img id="gallery-preview" width="150">
     </div>
 
     <button type="submit">
@@ -51,7 +54,7 @@
                 @csrf
                 @method('DELETE')
 
-                <button type="submit">
+                <button type="submit" class="delete-btn">
                     Delete
                 </button>
 
@@ -63,3 +66,7 @@
     @endforeach
 
 </table>
+
+<script src="{{ asset('js/global.js') }}"></script>
+<script src="{{ asset('js/gallery.js') }}"></script>
+@include('partials.foot')

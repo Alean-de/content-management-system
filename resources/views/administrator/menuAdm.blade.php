@@ -5,6 +5,7 @@
     <div>
         <label for="image">Image</label>
         <input type="file" id="image" name="image" required>
+        <img id="preview" width="150">
     </div>
     <div>
         <label for="name">Name</label>
@@ -38,7 +39,7 @@
     </button>
 </form>
 
-<table class="table">
+<table class="table" border="1" cellpadding="10">
     <thead>
         <tr>
             <th>No</th>
@@ -93,7 +94,7 @@
                         <form action="{{ route('administrator.menu.delete', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus menu ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
+                            <button type="submit" class="delete-btn">
                                 <i class="fas fa-trash"></i> Hapus
                             </button>
                         </form>
@@ -109,4 +110,6 @@
     </tbody>
 </table>
 
+<script src="{{ asset('js/global.js') }}"></script>
+<script src="{{ asset('js/menu.js') }}"></script>
 @include('partials.foot')

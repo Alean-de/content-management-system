@@ -24,7 +24,8 @@
 
     <div>
         <label>Image</label>
-        <input type="file" name="image" required>
+        <input type="file" name="image" id="image" required>
+        <img id="preview" width="200">
     </div>
 
     <div>
@@ -107,8 +108,7 @@
                         @csrf
                         @method('DELETE')
 
-                        <button type="submit"
-                                onclick="return confirm('Yakin hapus banner?')">
+                        <button type="submit" class="delete-btn">
                             Delete
                         </button>
 
@@ -131,4 +131,6 @@
     </tbody>
 </table>
 
+<script src="{{ asset('js/global.js') }}"></script>
+<script src="{{ asset('js/banner.js') }}"></script>
 @include('partials.foot')

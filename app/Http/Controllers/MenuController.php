@@ -42,7 +42,7 @@ class MenuController extends Controller
                 ->store('menu-items', 'public');
         }
 
-            Menu::create([
+            $menu = Menu::create([
             'category_id' => $request->category_id,
             'name' => $request->name,
             'description' => $request->description,
@@ -51,10 +51,11 @@ class MenuController extends Controller
             'is_featured' => $request->has('is_featured')
         ]);
 
-        return back()->with(
-            'success',
-            'Menu berhasil ditambahkan'
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'Menu berhasil ditambahkan',
+            'data' => $menu
+        ]);
     }
 
     public function showUpdate(Menu $menuItem)
@@ -118,5 +119,13 @@ class MenuController extends Controller
             'success',
             'Menu Berhasil Disimpan'
         );
+    }
+
+    public function jsonMenu()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => Menu::all()
+        ]);
     }
 }
