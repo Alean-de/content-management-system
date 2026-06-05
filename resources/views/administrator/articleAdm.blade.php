@@ -1,4 +1,6 @@
 @include('partials.head')
+@include('partials.navbar')
+
 
 <h2>Article Management</h2>
 

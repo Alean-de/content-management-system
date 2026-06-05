@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadMenuItems() {
     $.ajax({
-        url: '/administrator/menu', 
+        url: '/administrator/menu/', 
         method: 'GET',
         dataType: 'json',
         success: function(response) {
@@ -49,7 +49,7 @@ function loadMenuItems() {
                     minimumFractionDigits: 0
                 }).format(item.price);
 
-                let categoryName = item.category ? item.category.category_name : 'Tanpa Kategori';
+                let categoryName = item.category ? item.category.name : 'Tanpa Kategori';
 
                 let date = new Date(item.created_at);
                 let formattedDate = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -68,10 +68,10 @@ function loadMenuItems() {
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
                                 <a href="/administrator/menu/update/${item.id}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Edit
+                                    <i class="bi bi-pencil"></i>
                                 </a>
                                 <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="${item.id}">
-                                    <i class="fas fa-trash"></i> Hapus
+                                    <i class="bi bi-trash3"></i>
                                 </button>
                             </div>
                         </td>
@@ -96,7 +96,7 @@ $('#formTambahMenu').on('submit', function(e) {
     let formData = new FormData(this);
 
     $.ajax({
-        url: '/administrator/menu/api/menu',
+        url: '/administrator/menu/create/',
         method: 'POST',
         data: formData,
         processData: false,
@@ -109,7 +109,6 @@ $('#formTambahMenu').on('submit', function(e) {
                 $('#formTambahMenu')[0].reset();
                 $('#preview').attr('src', '');
 
-                // KUNCI EMAS: Menghidupkan ulang tabel secara dinamis tanpa refresh!
                 loadMenuItems(); 
             }
         },
@@ -134,7 +133,7 @@ $('#menuTableBody').on('click', '.btn-delete', function() {
 
         $.ajax({
             url: `/administrator/menu/delete/${menuId}`, 
-            method: 'DELETE', // Menggunakan HTTP Method DELETE bawaan Laravel
+            method: 'DELETE',
             success: function(response) {
                 if(response.success) {
                     alert(response.message);

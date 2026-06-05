@@ -1,4 +1,5 @@
 @include('partials.head')
+@include('partials.navbar')
 
 <h2>Banner Management</h2>
 

@@ -24,6 +24,8 @@
         </div>
 
         <button type="submit">Login</button>
+        <a href="{{ route('register') }}">Register</a>
+        <a href="{{ route('forgotPass') }}">Forgot Password</a>
     </form>
 </body>
 </html>

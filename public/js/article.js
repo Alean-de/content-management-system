@@ -1,6 +1,5 @@
 $(document).ready(function() {
 
-    // 1. Setup CSRF Token Global
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -10,7 +9,6 @@ $(document).ready(function() {
     // Panggil tabel saat halaman pertama dimuat
     loadArticles();
 
-    // 2. Live Preview Thumbnail & Character Counter (Gabungan)
     $('#thumbnail').on('change', function() {
         let file = this.files[0];
         if (file) {
@@ -23,10 +21,9 @@ $(document).ready(function() {
         $('#counter').text(len);
     });
 
-    // 3. FEATURE: READ DATA KE TABEL
     function loadArticles() {
         $.ajax({
-            url: '/administrator/article', // Menembak route index utama
+            url: '/administrator/article',
             method: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -67,7 +64,6 @@ $(document).ready(function() {
         });
     }
 
-    // 4. FEATURE: CREATE DATA (ANTI-SPAM)
     $('#formTambahArticle').on('submit', function(e) {
         e.preventDefault();
 
@@ -89,7 +85,6 @@ $(document).ready(function() {
                     $('#thumbnail-preview').attr('src', '');
                     $('#counter').text('0');
 
-                    // Sinkronisasi instan! Ambil ulang data tabel terbaru
                     loadArticles();
                 }
             },
@@ -103,7 +98,6 @@ $(document).ready(function() {
         });
     });
 
-    // 5. FEATURE: DELETE DATA (INSTAN & TERDELEGASI)
     $('#articleTableBody').on('click', '.btn-delete', function(e) {
         e.preventDefault();
         
@@ -119,7 +113,7 @@ $(document).ready(function() {
                 success: function(response) {
                     if (response.success) {
                         alert(response.message);
-                        // Ambil ulang data tabel terbaru tanpa kedip
+
                         loadArticles();
                     }
                 },

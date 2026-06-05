@@ -24,6 +24,7 @@ class MenuController extends Controller
         $categories = Category::all();
 
         return view('administrator.menuAdm', compact('menuItems', 'categories'));
+
     }
 
     public function store(Request $request)
@@ -42,8 +43,7 @@ class MenuController extends Controller
 
         if ($request->hasFile('image')) {
 
-            $imagePath = $request->file('image')
-                ->store('menu-items', 'public');
+            $imagePath = $request->file('image')->store('menu-items', 'public');
         }
 
             $menu = Menu::create([

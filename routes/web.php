@@ -7,6 +7,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('index');
@@ -14,13 +15,13 @@ Route::get('/', function () {
 
 Route::prefix('administrator')->middleware('guest')->group(function (){
 
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
-    Route::get('/forgot_password', [AuthController::class, 'showForgot']);
+    Route::get('/forgot_password', [AuthController::class, 'showForgot'])->name('forgotPass');
     Route::post('/forgot_password', [AuthController::class, 'change']);
 
 }); 
@@ -28,11 +29,11 @@ Route::prefix('administrator')->middleware('guest')->group(function (){
 Route::prefix('administrator')->middleware('auth')->name('administrator.')->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
     Route::prefix('menu')->name('menu.')->group(function () {
         Route::get('/', [MenuController::class, 'index']);
         Route::get('/update/{menuItem}', [MenuController::class, 'showUpdate'])->name('showUpdate');
-        Route::get('api/menu/', [MenuController::class, 'index'])->name('index');
-        Route::post('/api/menu', [MenuController::class, 'store'])->name('api.store');
         Route::post('/create', [MenuController::class, 'store'])->name('store');
         Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
         Route::delete('/delete/{menuItems}', [MenuController::class, 'delete'])->name('delete');
@@ -65,6 +66,13 @@ Route::prefix('administrator')->middleware('auth')->name('administrator.')->grou
         Route::get('/', [MessagesController::class, 'index']);
         Route::get('/show/{message}', [MessagesController::class, 'show'])->name('show');
         Route::delete('/delete/{message}', [MessagesController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'index']);
+        Route::put('/update/name', [ProfileController::class, 'updateName'])->name('name');
+        Route::put('/update/pass', [ProfileController::class, 'updatePassword'])->name('password');
+        Route::put('/update/email', [ProfileController::class, 'updateEmail'])->name('email');
     });
 
 });

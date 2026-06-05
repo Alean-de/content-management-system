@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     function loadBanners() {
         $.ajax({
-            url: '/administrator/banner', // Menembak rute index utama
+            url: '/administrator/banner',
             method: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -84,7 +84,6 @@ $(document).ready(function() {
                     $('#formTambahBanner')[0].reset();
                     $('#preview').attr('src', '');
 
-                    // Ambil ulang tabel terbaru secara realtime tanpa kedip
                     loadBanners();
                 }
             },
@@ -113,7 +112,7 @@ $(document).ready(function() {
                 success: function(response) {
                     if (response.success) {
                         alert(response.message);
-                        // Ambil ulang data tabel terbaru tanpa refresh halaman
+                        
                         loadBanners();
                     }
                 },

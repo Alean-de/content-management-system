@@ -1,6 +1,5 @@
 @include('partials.head')
 @include('partials.navbar')
-<link rel="stylesheet" href="{{ asset('css/menu.css') }}">
 
 
 <div class="modal fade" id="createMenu" tabindex="-1" aria-labelledby="createMenuModal" arria-hidden="true">
@@ -17,9 +16,9 @@
                 <div class="modal-body">
                     @csrf
                     <div>
-                        <img id="preview" width="150">
                         <label for="image" class="form-label">Image</label>
                         <input type="file" class="form-control" id="image" name="image" required>
+                        <img id="preview" width="150">
                     </div>
 
                     <div>
@@ -29,13 +28,13 @@
                     
                     <div>
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control textarea-fixed" id="description" name="description" required></textarea>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
                     </div>
 
                     <div>
                         <label for="category" class="form-label">Category</label>
                         <select name="category_id" id="category_id" class="form-select" required>
-                            <option value="" disabled selected>Pilih Kategori</option>
+                            <option value="">Pilih Kategori</option>
                             @foreach ($categories as $cat)
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
