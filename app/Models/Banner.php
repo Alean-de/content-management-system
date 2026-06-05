@@ -10,9 +10,9 @@ class Banner extends Model
         'title',
         'subtitle',
         'image',
-        'is_active',
         'start_date',
-        'end_date'
+        'end_date',
+        'is_active'
     ];
 
     protected $casts = [

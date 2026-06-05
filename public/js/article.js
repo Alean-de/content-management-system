@@ -1,129 +1,280 @@
+// Setup CSRF & Load Pertama
 $(document).ready(function() {
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
-    // Panggil tabel saat halaman pertama dimuat
     loadArticles();
+});
 
-    $('#thumbnail').on('change', function() {
-        let file = this.files[0];
-        if (file) {
-            $('#thumbnail-preview').attr('src', URL.createObjectURL(file));
-        }
-    });
+let targetArticleId = null;
+let currentSearch = '';
 
-    $('#content').on('input', function() {
-        let len = this.value.length;
-        $('#counter').text(len);
-    });
+// Listener Kolom Search
+$('#search').on('keyup', function() {
+    currentSearch = $(this).val();
+    loadArticles(1, currentSearch);
+});
 
-    function loadArticles() {
-        $.ajax({
-            url: '/administrator/article',
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                let $tableBody = $('#articleTableBody');
-                $tableBody.empty();
+// Character Counter Real-Time Handler
+$('#content').on('input', function() {
+    $('#counter').text($(this).val().length);
+});
 
-                if (response.data.length === 0) {
-                    $tableBody.append(`<tr><td colspan="6" align="center">Belum ada artikel.</td></tr>`);
-                    return;
-                }
+$('#edit-content').on('input', function() {
+    $('#edit-counter').text($(this).val().length);
+});
 
-                response.data.forEach(function(article, index) {
-                    let thumbUrl = article.thumbnail 
-                        ? `/storage/${article.thumbnail}` 
-                        : '/images/no-image.png';
+// Image Preview Handler
+document.addEventListener('DOMContentLoaded', () => {
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('preview');
+    const iconPlaceholder = document.getElementById('icon-placeholder');
 
-                    let rowHtml = `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td><img src="${thumbUrl}" width="100"></td>
-                            <td>${article.title}</td>
-                            <td>${article.user ? article.user.name : 'Unknown'}</td>
-                            <td>${article.published_at || '-'}</td>
-                            <td>
-                                <a href="/administrator/article/update/${article.id}">Edit</a>
-                                <button type="button" class="btn-delete" data-id="${article.id}" style="color:red; cursor:pointer; background:none; border:none; padding:0; margin-left:10px;">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    $tableBody.append(rowHtml);
-                });
-            },
-            error: function(xhr) {
-                console.error('Gagal mengambil data artikel:', xhr.responseJSON);
+    if(imageInput && preview){
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if(file){
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('d-none');
+                if(iconPlaceholder) iconPlaceholder.classList.add('d-none');
             }
         });
     }
 
-    $('#formTambahArticle').on('submit', function(e) {
-        e.preventDefault();
+    const editImageInput = document.getElementById('edit-image');
+    const editPreview = document.getElementById('edit-preview');
 
-        let $submitBtn = $(this).find('button[type="submit"]');
-        $submitBtn.prop('disabled', true).text('Adding Article...');
-
-        let formData = new FormData(this);
-
-        $.ajax({
-            url: '/administrator/article/create',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message);
-                    $('#formTambahArticle')[0].reset();
-                    $('#thumbnail-preview').attr('src', '');
-                    $('#counter').text('0');
-
-                    loadArticles();
-                }
-            },
-            error: function(xhr) {
-                alert('Gagal menyimpan artikel.');
-                console.log(xhr.responseJSON);
-            },
-            complete: function() {
-                $submitBtn.prop('disabled', false).text('Add Article');
+    if(editImageInput && editPreview){
+        editImageInput.addEventListener('change', () => {
+            const file = editImageInput.files[0];
+            if(file){
+                editPreview.src = URL.createObjectURL(file);
             }
         });
-    });
+    }
+});
 
-    $('#articleTableBody').on('click', '.btn-delete', function(e) {
-        e.preventDefault();
-        
-        let articleId = $(this).data('id');
-        
-        if (confirm('Apakah Anda yakin ingin menghapus artikel ini?')) {
-            let $thisBtn = $(this);
-            $thisBtn.prop('disabled', true).text('Deleting...');
+// Function Load Articles
+function loadArticles(page = 1, search = '') {
+    $.ajax({
+        url: `/administrator/article/?page=${page}&search=${encodeURIComponent(search)}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            let $tableBody = $('#articleTableBody');
+            $tableBody.empty();
 
-            $.ajax({
-                url: `/administrator/article/delete/${articleId}`,
-                method: 'DELETE',
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
+            if (response.data.length === 0) {
+                $tableBody.append(`<tr><td colspan="6" class="text-center py-4">Belum ada data artikel.</td></tr>`);
+                $('#paginationContainer').empty();
+                return;
+            }
 
-                        loadArticles();
-                    }
-                },
-                error: function(xhr) {
-                    alert('Gagal menghapus artikel.');
-                    console.log(xhr.responseJSON);
-                    $thisBtn.prop('disabled', false).text('Delete');
-                }
+            response.data.forEach(function(item, index) {
+                let thumbUrl = item.thumbnail ? `/storage/${item.thumbnail}` : '/images/no-image.png';
+                let authorName = item.user ? item.user.name : (item.author || 'Admin');
+                let date = new Date(item.created_at);
+                let formattedDate = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                let rowNumber = ((response.current_page - 1) * 10) + (index + 1);
+
+                let rowHtml = `
+                    <tr>
+                        <td>${rowNumber}</td>
+                        <td>
+                            <img src="${thumbUrl}" alt="Thumb" style="width: 100px; height: 60px; object-fit: cover;" class="rounded shadow-sm">
+                        </td>
+                        <td class="text-start fw-bold text-dark">${item.title}</td>
+                        <td>${authorName}</td>
+                        <td>${formattedDate}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" 
+                                        class="btn btn-warning btn-sm btn-edit" 
+                                        data-id="${item.id}"
+                                        data-title="${item.title}"
+                                        data-content="${item.content || ''}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="${item.id}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                $tableBody.append(rowHtml);
             });
+
+            renderPagination(response.current_page, response.last_page);
+        },
+        error: function(xhr) {
+            console.error('Gagal memuat data artikel:', xhr.responseJSON);
         }
     });
+}
 
+// Function Render Pagination
+function renderPagination(currentPage, lastPage) {
+    let $pagination = $('#paginationContainer');
+    $pagination.empty();
+
+    if (lastPage <= 1) return;
+
+    let prevDisabled = (currentPage === 1) ? 'disabled' : '';
+    $pagination.append(`<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`);
+
+    for (let i = 1; i <= lastPage; i++) {
+        let activeClass = (i === currentPage) ? 'active' : '';
+        $pagination.append(`<li class="page-item ${activeClass}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`);
+    }
+
+    let nextDisabled = (currentPage === lastPage) ? 'disabled' : '';
+    $pagination.append(`<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`);
+}
+
+// Click Paginasi
+$('#paginationContainer').on('click', '.page-link', function(e) {
+    e.preventDefault();
+    let targetPage = $(this).data('page');
+    if (targetPage) {
+        loadArticles(targetPage, currentSearch);
+    }
 });
+
+// Action Create Article
+$('#formTambahArticle').on('submit', function(e) {
+    e.preventDefault();
+    let $submitBtn = $(this).find('button[type="submit"]');
+    $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+
+    let formData = new FormData(this);
+
+    $.ajax({
+        url: '/administrator/article/create/',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if(response.success) {
+                $('#createArticle').modal('hide');
+                $('#formTambahArticle')[0].reset();
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
+                $('#counter').text('0');
+                loadArticles();
+                showToast(response.message || 'Artikel berhasil diterbitkan!', 'success');
+            } else {
+                showToast(response.message || 'Gagal menyimpan artikel.', 'danger');
+            }
+        },
+        error: function(xhr) {
+            $('#createArticle').modal('hide');
+            let errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan sistem.';
+            showToast(errorMsg, 'danger');
+        },
+        complete: function() {
+            $submitBtn.prop('disabled', false).text('Add Article');
+        }
+    });
+});
+
+// Populate Edit Modal
+$('#articleTableBody').on('click', '.btn-edit', function() {
+    let id = $(this).data('id');
+    let title = $(this).data('title');
+    let content = $(this).data('content');
+    let currentThumbUrl = $(this).closest('tr').find('img').attr('src');
+
+    $('#edit-id').val(id);
+    $('#edit-title').val(title);
+    $('#edit-content').val(content);
+    $('#edit-counter').text(content.length);
+    $('#edit-preview').attr('src', currentThumbUrl);
+
+    $('#formUpdateArticle').attr('action', `/administrator/article/update/${id}`);
+    $('#updateArticle').modal('show');
+});
+
+// Action Update Article Submit
+$('#formUpdateArticle').on('submit', function(e) {
+    e.preventDefault();
+    let $submitBtn = $(this).find('button[type="submit"]');
+    $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...');
+
+    let formData = new FormData(this);
+    formData.append('_method', 'PUT');
+
+    let actionUrl = $(this).attr('action');
+
+    $.ajax({
+        url: actionUrl,
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if(response.success) {
+                $('#updateArticle').modal('hide');
+                loadArticles();
+                showToast(response.message || 'Artikel berhasil diperbarui!', 'success');
+            } else {
+                showToast(response.message || 'Gagal memperbarui data.', 'danger');
+            }
+        },
+        error: function(xhr) {
+            $('#updateArticle').modal('hide');
+            showToast('Gagal merubah data artikel.', 'danger');
+        },
+        complete: function() {
+            $submitBtn.prop('disabled', false).text('Simpan Perubahan');
+        }
+    });
+});
+
+// Trigger Delete Modal
+$('#articleTableBody').on('click', '.btn-delete', function() {
+    targetArticleId = $(this).data('id');
+    $('#deleteArticleModal').modal('show');
+});
+
+// Confirm Delete Action
+$('#btnConfirmDeleteArticle').on('click', function() {
+    if (!targetArticleId) return;
+    let $confirmBtn = $(this);
+    $confirmBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Erasing...');
+
+    $.ajax({
+        url: `/administrator/article/delete/${targetArticleId}`,
+        method: 'DELETE',
+        success: function(response) {
+            if(response.success) {
+                $('#deleteArticleModal').modal('hide');
+                loadArticles();
+                showToast(response.message || 'Artikel berhasil dihapus permanen!', 'success');
+            } else {
+                showToast(response.message || 'Gagal menghapus data.', 'danger');
+            }
+        },
+        error: function(xhr) {
+            $('#deleteArticleModal').modal('hide');
+            showToast('Kesalahan server saat menghapus data.', 'danger');
+        },
+        complete: function() {
+            $confirmBtn.prop('disabled', false).text('Ya, Hapus');
+            targetArticleId = null;
+        }
+    });
+});
+
+// Function Show Toast
+function showToast(message, type = 'success') {
+    let $toast = $('#liveToast');
+    $toast.removeClass('text-bg-success text-bg-danger');
+    $toast.addClass(type === 'success' ? 'text-bg-success' : 'text-bg-danger');
+    $('#toastMessage').text(message);
+    bootstrap.Toast.getOrCreateInstance($toast[0]).show();
+}

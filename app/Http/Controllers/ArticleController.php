@@ -10,17 +10,33 @@ use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
+    // 1. Menampilkan Data Artikel & Fitur Pencarian + Paginasi
     public function index(Request $request)
     {
-       $articles = Article::with('user')->latest()->get();
- 
+        $search = $request->input('search');
+
+        // Buat query dasar mengambil artikel beserta relasi user/pembuatnya (Eager Loading)
+        $query = Article::with('user')->latest();
+
+        // Jika ada input pencarian dari JavaScript, saring berdasarkan judul (title)
+        if (!empty($search)) {
+            $query->where('title', 'LIKE', '%' . $search . '%');
+        }
+
+        // Batasi data hanya 10 item per halaman (mengubah ->get() menjadi ->paginate())
+        $articles = $query->paginate(10);
+        
+        // Jika request datang dari AJAX (JavaScript), kembalikan data berformat JSON lengkap dengan metadata paginasi
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
-                'success' => true,
-                'data' => $articles
+                'success'      => true,
+                'data'         => $articles->items(),       // Hanya memuntahkan array datanya
+                'current_page' => $articles->currentPage(), // Mengirim halaman aktif saat ini (Fix NaN)
+                'last_page'    => $articles->lastPage(),    // Mengirim total halaman terakhir
             ]);
         }
 
+        // Jika halaman diakses langsung lewat browser (bukan AJAX)
         return view('administrator.articleAdm', compact('articles'));
     }
 
@@ -50,11 +66,6 @@ class ArticleController extends Controller
             'success' => true,
             'message' => 'Article berhasil ditambahkan!'
         ]);
-    }
-
-    public function showUpdate(Article $article)
-    {
-        return view('administrator.updateArticle', compact('article'));
     }
 
     public function updateArticle(Request $request, Article $article)
