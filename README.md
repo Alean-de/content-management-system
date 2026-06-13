@@ -40,7 +40,7 @@ Pastikan lingkungan lokal Anda sudah terpasang Composer, Node.js, dan MySQL. Jal
 
 ```bash
 # 1. Clone repositori dan masuk ke direktori proyek
-git clone [https://github.com/username/nama-repo.git](https://github.com/username/nama-repo.git)
+git clone https://github.com/Alean-de/add-dawn-cms
 cd nama-repo
 
 # 2. Instalasi dependencies PHP dan JavaScript
