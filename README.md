@@ -1,4 +1,4 @@
-# 📝 Cafe CMS & Promotion Platform
+# Cafe CMS & Promotion Platform
 
 Platform *Content Management System* (CMS) berbasis web yang dirancang khusus untuk mengelola konten dan membantu promosi cafe lokal, sekaligus menjadi media untuk meningkatkan *personal branding*.
 
@@ -17,7 +17,7 @@ Banyak cafe lokal yang memiliki potensi besar namun menghadapi kesulitan dalam m
 * **Antarmuka yang Dinamis:** Menggabungkan interaktivitas halaman dengan manipulasi DOM yang responsif menggunakan jQuery dan AJAX.
 * **Kemudahan Pengelolaan:** Struktur navigasi admin dirancang agar *user-friendly* bagi pengelola konten.
 
-## 🌟 4. Fitur Saat Ini (Sisi Admin)
+## 4. Fitur Saat Ini (Sisi Admin)
 Sebagai platform CMS murni, seluruh fitur yang tersedia saat ini berfokus pada pengelolaan konten internal melalui panel Admin:
 
 * **Authentication:** Sistem login dan registrasi dasar untuk mengamankan akses masuk ke panel *dashboard* admin.
