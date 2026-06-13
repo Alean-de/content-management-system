@@ -35,30 +35,5 @@ Banyak cafe lokal yang memiliki potensi besar namun menghadapi kesulitan dalam m
 * **Frontend Scripting:** JavaScript (jQuery / AJAX)
 * **Database:** MySQL
 
-## 7. Dokumentasi Instalasi
-Pastikan lingkungan lokal Anda sudah terpasang Composer, Node.js, dan MySQL. Jalankan perintah berikut di terminal Anda secara berurutan untuk memasang proyek:
-
-```bash
-# 1. Clone repositori dan masuk ke direktori proyek
-git clone https://github.com/Alean-de/add-dawn-cms
-cd nama-repo
-
-# 2. Instalasi dependencies PHP dan JavaScript
-composer install
-npm install && npm run dev
-
-# 3. Salin file konfigurasi environment
-cp .env.example .env
-
-# 4. Generate application key Laravel
-php artisan key:generate
-
-# 5. Jalankan migrasi database (Pastikan konfigurasi database di .env sudah disesuaikan)
-php artisan migrate
-
-# 6. Jalankan server lokal
-php artisan serve
-```
-
-## 8. Kesimpulan
+## 7. Kesimpulan
 Platform ini merupakan solusi CMS yang potensial untuk mengdigitalisasi data promosi cafe lokal. Meskipun saat ini masih memiliki keterbatasan keamanan karena belum adanya pembatasan akses, rencana implementasi RBAC (Owner & Admin) serta sistem approval konten akan mengubah platform ini menjadi sistem manajemen yang aman, tepercaya, dan siap diimplementasikan secara profesional.
