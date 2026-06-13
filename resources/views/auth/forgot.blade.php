@@ -1,9 +1,6 @@
-@include('partials.head')
+@include('partials.admin.header')
 
 <style>
-    body {
-        background-color: #f8f9fa !important;
-    }
     .forgot-wrapper {
         min-height: 85vh;
         display: flex;
@@ -17,18 +14,18 @@
         width: 100%;
     }
     .form-control {
-        background-color: #f8f9fa;
+        background-color: var(--bs-tertiary-bg);
         border: none;
         padding: 10px 12px;
         border-radius: 0 8px 8px 0;
     }
     .form-control:focus {
-        background-color: #fff;
+        background-color: var(--bs-body-bg);
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         border: 1px solid #0d6efd;
     }
     .input-group-text {
-        background-color: #f8f9fa;
+        background-color: var(--bs-tertiary-bg);
         border: none;
         border-radius: 8px 0 0 8px;
         color: #6c757d;
@@ -36,11 +33,11 @@
 </style>
 
 <div class="container forgot-wrapper py-5">
-    <div class="card forgot-card shadow-lg p-4 bg-white">
+    <div class="card forgot-card shadow-lg p-4 bg-body">
         <div class="card-body">
             
             <div class="text-center mb-4">
-                <h3 class="fw-bold text-dark m-0 tracking-tight">
+                <h3 class="fw-bold text-body m-0 tracking-tight">
                     Adddawn<span class="text-primary bg-primary bg-opacity-10 px-2 py-0.5 rounded-2 ms-1 fw-semibold" style="font-size: 14px; letter-spacing: 0.5px;">Admin</span>
                 </h3>
                 <p class="text-muted small mt-2">Masukkan email terdaftar untuk menerima link instruksi reset password</p>
