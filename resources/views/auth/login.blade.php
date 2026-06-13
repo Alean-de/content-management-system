@@ -1,94 +1,91 @@
 @include('partials.head')
 
-<div class="container-fluid bg-light min-vh-100 d-flex p-0">
-    <div class="row g-0 w-100">
-        
-        <div class="col-12 col-md-6 bg-primary d-none d-md-flex flex-column justify-content-between p-5 text-white position-relative" 
-             style="background: linear-gradient(135deg, #0d6efd 0%, #0a4ebd 100%) !important;">
+<style>
+
+    .login-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-card {
+        border: none;
+        border-radius: 16px;
+        max-width: 450px;
+        width: 100%;
+    }
+    .form-control {
+        background-color: var(--bs-tertiary-bg);
+        border: none;
+        padding: 10px 12px;
+        border-radius: 0 8px 8px 0;
+    }
+    .form-control:focus {
+        background-color: var(--bs-body-bg);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        border: 1px solid #0d6efd;
+    }
+    .input-group-text {
+        background-color: var(--bs-tertiary-bg);
+        border: none;
+        border-radius: 8px 0 0 8px;
+       color: var(--bs-secondary-color);
+    }
+</style>
+
+<div class="container login-wrapper py-5">
+    <div class="card login-card shadow-lg p-4 bg-body">
+        <div class="card-body">
             
-            <div class="d-flex align-items-center gap-2">
-                <div class="bg-white rounded-3 text-primary d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <span class="fw-bold fs-5 tracking-tight">Ukrida<span class="text-white bg-white bg-opacity-20 px-2 py-0.5 rounded-2 ms-1 small" style="font-size: 12px;">Admin</span></span>
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-body m-0 tracking-tight">
+                    Adddawn<span class="text-primary bg-primary bg-opacity-10 px-2 py-0.5 rounded-2 ms-1 fw-semibold" style="font-size: 14px; letter-spacing: 0.5px;">Admin</span>
+                </h3>
+                <p class="text-muted small mt-2">Sign in untuk mengelola menu, banner, galeri, dan pesan restoran Addawn</p>
             </div>
 
-            <div class="my-auto max-width-sm">
-                <h2 class="fw-bold tracking-tight mb-2" style="font-size: 32px;">Selamat Datang Kembali</h2>
-                <p class="text-white text-opacity-75 small m-0">Silakan masuk menggunakan akun administrator Anda untuk mengelola konten menu, artikel, banner, dan pesan pelanggan secara real-time.</p>
-            </div>
-
-            <div class="text-white text-opacity-50 small" style="font-size: 11px;">
-                &copy; {{ date('Y') }} Ukrida Admin Dashboard. All rights reserved.
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 d-flex flex-column justify-content-center bg-white p-4 p-sm-5 position-relative">
-            
-            <div class="d-flex d-md-none align-items-center gap-2 position-absolute top-0 start-0 m-4">
-                <div class="bg-primary rounded-3 text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <span class="fw-bold text-dark">Ukrida<span class="text-primary">Admin</span></span>
-            </div>
-
-            <div class="mx-auto w-100" style="max-width: 400px;">
+            <form method="POST" action="{{ route('auth.login') }}">
+                @csrf
                 
-                <div class="mb-4">
-                    <h4 class="fw-bold text-dark mb-1 tracking-tight">Sign In</h4>
-                    <p class="text-muted small m-0">Masukkan kredensial akun Anda untuk melanjutkan</p>
+                <div class="mb-3">
+                    <label for="identity" class="form-label small fw-bold text-secondary mb-1">Email atau Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" id="identity" name="identity" 
+                               class="form-control @error('identity') is-invalid @enderror" 
+                               placeholder="Username atau nama@email.com" required>
+                    </div>
+                    @error('identity')
+                        <div class="text-danger mt-1 fw-semibold" style="font-size: 11px;">
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> {{ $message }}
+                        </div>
+                    @enderror
                 </div>
 
-                <form method="POST" action="{{ route('auth.login') }}">
-                    @csrf
-                    
-                    <div class="mb-3">
-                        <label for="identity" class="form-label small fw-bold text-secondary mb-1">Email atau Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-0 text-muted pe-0 rounded-start-3">
-                                <i class="bi bi-person"></i>
-                            </span>
-                            <input type="text" id="identity" name="identity" 
-                                   class="form-control bg-light border-0 py-2.5 rounded-end-3 @error('identity') is-invalid @enderror" 
-                                   placeholder="Username atau nama@email.com" required>
-                        </div>
-                        @error('identity')
-                            <div class="text-danger mt-1 fw-semibold" style="font-size: 11px;">
-                                <i class="bi bi-exclamation-circle-fill me-1"></i> {{ $message }}
-                            </div>
-                        @enderror
+                <div class="mb-4">
+                    <label for="password" class="form-label small fw-bold text-secondary mb-1">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="password" name="password" 
+                               class="form-control" placeholder="••••••••" required>
                     </div>
+                </div>
 
-                    <div class="mb-4">
-                        <label for="password" class="form-label small fw-bold text-secondary mb-1">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-0 text-muted pe-0 rounded-start-3">
-                                <i class="bi bi-key"></i>
-                            </span>
-                            <input type="password" id="password" name="password" 
-                                   class="form-control bg-light border-0 py-2.5 rounded-end-3" 
-                                   placeholder="••••••••" required>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold small shadow-sm border-0 mb-3">
-                        Sign In Account
-                    </button>
-
-                    <div class="d-flex justify-content-between align-items-center mt-2 px-1" style="font-size: 12px;">
-                        <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-semibold hover-underline">
-                            <i class="bi bi-person-plus me-1"></i> Register
-                        </a>
-                        <a href="{{ route('forgotPass') }}" class="text-muted text-decoration-none hover-underline">
-                            Forgot Password?
-                        </a>
-                    </div>
-
-                </form>
-            </div>
+                <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold rounded-3 shadow-sm border-0 mb-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In Account
+                </button>
+                
+                <div class="d-flex justify-content-between align-items-center mt-2 px-1" style="font-size: 12px;">
+                    <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-semibold hover-underline">
+                        <i class="bi bi-person-plus me-1"></i> Register Account
+                    </a>
+                    <a href="{{ route('forgotPass') }}" class="text-muted text-decoration-none hover-underline">
+                        Forgot Password?
+                    </a>
+                </div>
+            </form>
 
         </div>
     </div>
 </div>
 
-@include('partials.foot')

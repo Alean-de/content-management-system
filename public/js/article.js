@@ -86,9 +86,9 @@ function loadArticles(page = 1, search = '') {
                         <td>
                             <img src="${thumbUrl}" alt="Thumb" style="width: 100px; height: 60px; object-fit: cover;" class="rounded shadow-sm">
                         </td>
-                        <td class="text-start fw-bold text-dark">${item.title}</td>
-                        <td>${authorName}</td>
-                        <td>${formattedDate}</td>
+                        <td class="text-start fw-bold text-body">${item.title}</td>
+                        <td class="text-start text-muted small">${authorName}</td>
+                        <td class="text-start text-muted small">${formattedDate}</td>
                         <td>
                             <div class="d-flex justify-content-center gap-2">
                                 <button type="button" 
@@ -169,12 +169,29 @@ $('#formTambahArticle').on('submit', function(e) {
                 showToast(response.message || 'Artikel berhasil diterbitkan!', 'success');
             } else {
                 showToast(response.message || 'Gagal menyimpan artikel.', 'danger');
+
+                $('#formTambahArticle').find('input[type="file"]').val('');
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
             }
         },
         error: function(xhr) {
-            $('#createArticle').modal('hide');
-            let errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan sistem.';
+           let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
             showToast(errorMsg, 'danger');
+            console.log(xhr.responseJSON);
+
+            $('#formTambahArticle').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Add Article');
@@ -226,8 +243,22 @@ $('#formUpdateArticle').on('submit', function(e) {
             }
         },
         error: function(xhr) {
-            $('#updateArticle').modal('hide');
-            showToast('Gagal merubah data artikel.', 'danger');
+           let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
+            showToast(errorMsg, 'danger');
+            console.log(xhr.responseJSON);
+
+            $('#formUpdateArticle').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Simpan Perubahan');

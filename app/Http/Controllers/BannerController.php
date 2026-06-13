@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage; 
 use App\Models\Banner;
+use Illuminate\Support\Facades\Validator;
 
 class BannerController extends Controller
 {
@@ -48,13 +49,27 @@ class BannerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-            'subtitle' => 'nullable|max:255',
-            'image' => 'required|image',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+        
+        $validator = Validator::make($request->all(), [
+            'title'      => ['required', 'string', 'max:255'],
+            'subtitle'   => ['nullable', 'string', 'max:255'],
+            'start_date' => ['required', 'date'],
+            'end_date'   => ['required', 'date', 'after_or_equal:start_date'], 
+            'image'      => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=21/9'],
+        ], [
+            'image.dimensions' => 'Gunakan foto dengan aspek rasio :9',
+            'image.max'        => 'Ukuran maksimal 2MB',
+            'image.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'image.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.',
+            'end_date.after_or_equal' => 'Gagal! Tanggal selesai tidak boleh mendahului tanggal mulai.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -68,6 +83,7 @@ class BannerController extends Controller
             'is_active' => $request->has('is_active'),
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'is_active' => $request->has('is_active') ? 1 : 0
         ]);
 
         return response()->json([
@@ -79,13 +95,26 @@ class BannerController extends Controller
     public function updateBanner(Request $request, Banner $banner)
     {
         // 1. Validasi input form banner
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title'      => ['required', 'string', 'max:255'],
             'subtitle'   => ['nullable', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'end_date'   => ['required', 'date'],
-            'image'      => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048']
+            'image'      => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=21/9']
+        ], [
+            'image.dimensions' => 'Gunakan foto dengan aspek rasio 21:9',
+            'image.max'        => 'Ukuran maksimal 2MB',
+            'image.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'image.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.',
+            'end_date.after_or_equal' => 'Gagal! Tanggal selesai tidak boleh mendahului tanggal mulai.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $imagePath = $banner->image; // Default pakai gambar banner yang lama
 
@@ -104,8 +133,8 @@ class BannerController extends Controller
             'title'       => $request->title,
             'subtitle'    => $request->subtitle,
             'image'       => $imagePath,
-            'start_date'  => $request->start_date, // FIX: Tanggal mulai disimpan
-            'end_date'    => $request->end_date,   // FIX: Tanggal selesai disimpan
+            'start_date'  => $request->start_date,
+            'end_date'    => $request->end_date,
             'is_active'   => $request->has('is_active') ? 1 : 0
         ]);
 

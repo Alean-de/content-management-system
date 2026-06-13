@@ -7,12 +7,13 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
 {
     // 1. Menampilkan Data & Fitur Pencarian + Paginasi
-    public function index(Request $request): View|JsonResponse
+    public function index(Request $request)
     {
         $search = $request->input('search');
         $category = $request->input('category');
@@ -54,15 +55,27 @@ class MenuController extends Controller
     public function store(Request $request): JsonResponse
     {
         // Validasi inputan form
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'category_id' => ['required', 'exists:categories,id'],
             'name'        => ['required', 'string', 'max:255'],
             'price'       => ['required', 'numeric'],
             'description' => ['nullable', 'string'],
-            'image'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'image'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=4/3'],
+        ], [
+            'image.dimensions' => 'Gunakan foto dengan aspek rasio 4:3',
+            'image.max' => 'Ukuran maksimal 2MB',
+            'image.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'image.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.'
         ]);
 
-        // Paksa isi request is_featured bernilai 1 atau 0 sebelum create agar tidak lolos null
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+       
         $request->merge([
             'is_featured' => $request->has('is_featured') ? 1 : 0
         ]);
@@ -74,7 +87,6 @@ class MenuController extends Controller
             $imagePath = $request->file('image')->store('menu-items', 'public');
         }
 
-        // Simpan data baru ke database (Sekarang sudah lolos $fillable aman)
         $menu = Menu::create([
             'category_id' => $request->category_id,
             'name'        => $request->name,
@@ -88,20 +100,32 @@ class MenuController extends Controller
             'success' => true,
             'message' => 'Menu berhasil ditambahkan',
             'data'    => $menu
-        ]);
+        ], 200);
     }
 
     // 4. Memperbarui Data Menu
     public function updateMenu(Request $request, Menu $menuItem): JsonResponse
     {
         // Validasi input (image diatur nullable karena boleh tidak diganti)
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'category_id' => ['required', 'exists:categories,id'],
             'name'        => ['required', 'string', 'max:255'],
             'price'       => ['required'],
             'description' => ['nullable', 'string'],
-            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048']
+            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=4/3']
+        ], [
+            'image.dimensions' => 'Gunakan foto dengan aspek rasio 4:3',
+            'image.max'        => 'Ukuran maksimal 2MB',
+            'image.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'image.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $price = str_replace('.', '', $request->price);
         $imagePath = $menuItem->image; // Default pakai path gambar lama

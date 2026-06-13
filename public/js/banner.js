@@ -95,11 +95,13 @@ function loadBanners(page = 1, search = '', status = '') {
                         <td>
                             <img src="${imgUrl}" alt="Banner" style="width: 140px; height: 65px; object-fit: cover;" class="rounded shadow-sm">
                         </td>
-                        <td class="text-start fw-bold text-dark">${item.title}</td>
-                        <td class="text-start text-muted">${item.subtitle || '-'}</td>
+                        <td class="text-start fw-bold text-body">${item.title}</td>
+                        
+                        <td class="text-start text-muted small">${item.subtitle || '-'}</td>
+                        
                         <td>${statusBadge}</td>
-                        <td>${formatDate(item.start_date)}</td>
-                        <td>${formatDate(item.end_date)}</td>
+                        <td class="text-muted small">${formatDate(item.start_date)}</td>
+                        <td class="text-muted small">${formatDate(item.end_date)}</td>
                         <td>
                             <div class="d-flex justify-content-center gap-2">
                                 <button type="button" 
@@ -182,11 +184,29 @@ $('#formTambahBanner').on('submit', function(e) {
                 showToast(response.message || 'Banner promo berhasil disimpan!', 'success');
             } else {
                 showToast(response.message || 'Gagal menyimpan banner.', 'danger');
+
+                $('#formTambahBanner').find('input[type="file"]').val('');
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
             }
         },
         error: function(xhr) {
-            $('#createBanner').modal('hide');
-            showToast('Gagal memproses data banner.', 'danger');
+            let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
+            showToast(errorMsg, 'danger');
+            console.log(xhr.responseJSON);
+
+            $('#formTambahBanner').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Save Banner');
@@ -200,16 +220,16 @@ $('#bannerTableBody').on('click', '.btn-edit', function() {
     let title = $(this).data('title');
     let subtitle = $(this).data('subtitle');
     let start = $(this).data('start');
-    let end = $(this).data('end');
-    let active = $(this).data('active'); // Mengambil data-active="${item.is_active}"
+        let end = $(this).data('end');
+        let active = $(this).data('active'); // Mengambil data-active="${item.is_active}"
     let currentThumbUrl = $(this).closest('tr').find('img').attr('src');
 
     // Tembak data ke element form modal edit
     $('#edit-id').val(id);
     $('#edit-title').val(title);
     $('#edit-subtitle').val(subtitle);
-    $('#edit-start_date').val(start); // Memastikan format YYYY-MM-DD masuk ke input date
-    $('#edit-end_date').val(end);
+    $('#edit-start-date').val(start);
+    $('#edit-end-date').val(end);
     $('#edit-preview').attr('src', currentThumbUrl);
 
     // Sinkronisasi status Switch Toggle Aktif/Tidak Aktif
@@ -250,8 +270,22 @@ $('#formUpdateBanner').on('submit', function(e) {
             }
         },
         error: function(xhr) {
-            $('#updateBanner').modal('hide');
-            showToast('Gagal memperbarui data banner.', 'danger');
+            let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
+            showToast(errorMsg, 'danger');
+            console.log(xhr.responseJSON);
+
+            $('#formTambahBanner').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Simpan Perubahan');

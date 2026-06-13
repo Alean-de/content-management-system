@@ -2,7 +2,8 @@
 $(document).ready(function() {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            'Accept': 'application/json',
         }
     });
     loadMenuItems();
@@ -90,11 +91,11 @@ function loadMenuItems(page = 1, search = '', category = '') {
                         <td>
                             <img src="${imageUrl}" alt="${item.name}" style="width: 100px; height: auto; object-fit: cover;" class="img-thumbnail">
                         </td>
-                        <td>${item.name}</td>
-                        <td>${item.description || ''}</td>
-                        <td>${formattedPrice}</td>
-                        <td>${categoryName}</td>
-                        <td>${formattedDate}</td>
+                        <td class="text-start fw-bold text-body">${item.name}</td>
+                        <td class="text-start text-muted small">${item.description || ''}</td>
+                        <td class="text-start text-muted small">${formattedPrice}</td>
+                        <td class="text-start text-muted small">${categoryName}</td>
+                        <td class="text-start text-muted small">${formattedDate}</td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
                                 <button type="button" 
@@ -163,7 +164,7 @@ $('#formTambahMenu').on('submit', function(e) {
     let formData = new FormData(this);
 
     $.ajax({
-        url: '/administrator/menu/create/',
+        url: '/administrator/menu/create',
         method: 'POST',
         data: formData,
         processData: false,
@@ -177,13 +178,30 @@ $('#formTambahMenu').on('submit', function(e) {
                 showToast(response.message || 'Menu berhasil ditambahkan!', 'success');
             } else {
                 showToast(response.message || 'Gagal menyimpan data.', 'danger');
+
+                $('#formTambahMenu').find('input[type="file"]').val('');
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
             }
         },
         error: function(xhr) {
-            $('#createMenu').modal('hide');
-            let errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Gagal menyimpan data.';
+            
+            let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            
             showToast(errorMsg, 'danger');
             console.log(xhr.responseJSON);
+
+            $('#formTambahMenu').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Add Menu');
@@ -219,10 +237,27 @@ $('#formUpdateMenu').on('submit', function(e) {
             }
         },
         error: function(xhr) {
-            $('#updateMenu').modal('hide');
-            let errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Gagal memperbarui data.';
+            
+            let errorMsg = 'Gagal menyimpan data.';
+            
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                let errors = xhr.responseJSON.errors;
+                let firstKey = Object.keys(errors)[0];
+                errorMsg = errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+
+                $('#formUpdateMenu').find('input[type="file"]').val('');
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
+            }
+            
             showToast(errorMsg, 'danger');
             console.log(xhr.responseJSON);
+
+            $('#formUpdateMenu').find('input[type="file"]').val('');
+            $('#preview').addClass('d-none');
+            $('#icon-placeholder').removeClass('d-none');
         },
         complete: function() {
             $submitBtn.prop('disabled', false).text('Simpan Perubahan');
