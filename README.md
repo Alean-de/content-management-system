@@ -33,13 +33,43 @@ Sebagai platform CMS murni, seluruh fitur yang tersedia saat ini berfokus pada p
 * **Belum Menerapkan RBAC:** Sistem otorisasi belum berjalan, sehingga belum ada pemisahan hak akses yang jelas antara pemilik platform dan pengelola harian.
 * **Akses Admin Terbuka:** Pengguna luar (di luar manajemen) saat ini masih dapat mengakses halaman atau fungsi administratif secara langsung.
 
-## 6. Rencana Pengembangan (Roadmap)
-* **Implementasi RBAC (Role-Based Access Control):** Menambahkan pembagian hak akses yang tegas antara dua *role* utama:
-  * **Owner:** Memegang kendali penuh atas sistem, persetujuan akun, dan moderasi akhir.
-  * **Admin:** Bertugas mengelola konten harian cafe (menu, event, detail informasi).
-* **Sistem Approval Pendaftaran Akun:** Pendaftaran akun Admin baru wajib melalui persetujuan (*approval*) dari Owner terlebih dahulu sebelum bisa mengakses *dashboard*.
-* **Moderasi Konten & Validasi Foto:** Semua unggahan foto dari Admin wajib melewati kurasi atau *approval* Owner guna menghindari konten yang tidak sesuai aturan (seperti konten 18+, web judi, atau gambar *corrupt*).
-  * **Aturan Validasi Berkas:** Format gambar dibatasi ketat hanya menerima file berekstensi `jpg`, `jpeg`, dan `png` dengan batas ukuran maksimal tertentu (maks. 2048 KB) sebelum diajukan ke Owner.
+## 🔮 6. Rencana Pengembangan (Roadmap & Next Targets)
+
+### v1.1 Security Foundation
+* **Fitur:** RBAC (Owner & Admin), Account Approval, Role Middleware, Approval Middleware, Login Rate Limiting, File Validation Hardening.
+* **Target:** Semua user tidak lagi memiliki akses yang sama.
+
+### v1.2 Content Workflow
+* **Fitur:** Draft, Review, Approved, Published, Rejected, Archived, Scheduled Publish, Auto Archive.
+* **Target:** Konten tidak lagi langsung tayang setelah dibuat.
+
+### v1.3 Monitoring & Audit
+* **Fitur:** Activity Log, Approval History, Notification, Dashboard Summary.
+* **Target:** Owner tahu siapa melakukan apa.
+
+### v1.4 Code Quality & Architecture (Refactoring)
+* **Fitur:** Form Request Validation, Service Layer (opsional), Reusable Upload Service, Reusable Activity Logger.
+* **Target:** Mengurangi duplikasi kode sebelum fitur makin banyak. Mengingat pola controller yang mulai berulang, melakukan refactoring sejak awal akan mencegah kompleksitas kode yang berlebihan daripada menundanya sampai belasan controller selesai dibuat.
+
+### v1.5 Security Hardening
+* **Fitur:** XSS Sanitization, Security Headers, Email Verification, Owner 2FA, Cloudflare Integration.
+* **Target:** Memperkuat keamanan aplikasi yang sudah berjalan.
+
+### v1.6 Performance Optimization
+* **Fitur:** Image Compression, Thumbnail Generation, Cache, Query Optimization, Lazy Loading.
+* **Target:** Menjaga performa sistem agar tetap optimal saat traffic dan volume data bertambah.
+
+### v1.7 Marketing & SEO
+* **Fitur:** Dynamic Meta Tags, Sitemap, robots.txt, Open Graph, Structured Data.
+* **Target:** Meningkatkan *discoverability* dan visibilitas platform di mesin pencari.
+
+### v2.0 Business Insight
+* **Fitur:** Rating Menu, Most Viewed Article, Most Viewed Menu, Click Tracking, Recommendation Section.
+* **Target:** Mengubah peran platform dari sekadar CMS pasif menjadi alat bantu pengambilan keputusan bisnis yang strategis.
+
+### v3.0 Enterprise Expansion
+* **Fitur:** POS Integration, Inventory, Purchase Order, Supplier, Best Seller Analysis.
+* **Target:** Transformasi skala besar dari aplikasi CMS promosi biasa menjadi **Cafe Management System** end-to-end yang komprehensif.
 
 ## 7. Tech Stack (Teknologi yang Digunakan)
 * **Framework Backend:** Laravel
