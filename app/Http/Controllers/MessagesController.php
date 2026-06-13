@@ -40,6 +40,39 @@ class MessagesController extends Controller
         return view('administrator.messageAdm', compact('messages'));
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'whatsapp' => 'nullable|string|max:50', 
+            'subject'  => 'nullable|string|max:255',
+            'message'  => 'required|string',
+        ]);
+
+
+        $whatsappData = $request->input('whatsapp') ?? $request->input('email') ?? '-';
+        $subjectData  = $request->input('subject') ?? 'Pesan Baru dari Web Adddawn';
+
+      
+        $newMessage = Messages::create([
+            'name'     => $request->name,
+            'whatsapp' => $whatsappData,
+            'subject'  => $subjectData,
+            'message'  => $request->message,
+        ]);
+
+        // 4. Jika pengiriman pesan dikirim via AJAX (Biar halaman gak perlu ke-refresh)
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan kamu berhasil terkirim ke tim Adddawn'
+            ]);
+        }
+
+        // 5. Fallback: Jika dikirim pakai submit form HTML biasa, redirect balik dengan flash message
+        return redirect()->back()->with('success', 'Pesan kamu berhasil dikirim');
+    }
+
     // 2. Menghapus Data Pesan Permanen via AJAX Modal (Menggunakan ID agar kebal dari salah parameter)
     public function delete($id): JsonResponse
     {

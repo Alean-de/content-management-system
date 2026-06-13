@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('image/logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('image/logo.png') }}">
+
+    <title>@yield('title', 'Addawn')</title>
+
     <title>Document</title>
 
     {{-- CSS Bootstrap --}}
@@ -17,5 +23,7 @@
 
     {{-- Bootstrap Icon --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <script src="{{ asset('js/global.js') }}"></script>
 </head>
 <body>

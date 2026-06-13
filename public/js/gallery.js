@@ -17,7 +17,7 @@ $(document).ready(function() {
     $('#gallery-image').on('change', function() {
         let file = this.files[0];
         if (file) {
-            $('#gallery-preview').attr('src', URL.createObjectURL(file)).removeClass('d-none');
+            $('#preview').attr('src', URL.createObjectURL(file)).removeClass('d-none');
             $('#icon-placeholder').addClass('d-none');
         }
     });
@@ -50,7 +50,7 @@ $(document).ready(function() {
                             <td>
                                 <img src="${imgUrl}" alt="${gallery.title}" style="width: 75px; height: 75px; object-fit: cover;" class="rounded shadow-sm border">
                             </td>
-                            <td class="text-center fw-semibold text-dark">${gallery.title}</td>
+                            <td class="text-start fw-bold text-body">${gallery.title}</td>
                             <td>
                                 <div class="d-flex justify-content-center">
                                     <button type="button" class="btn btn-danger btn-sm btn-delete d-flex align-items-center gap-1 px-3 py-1.5 rounded-3" data-id="${gallery.id}">
@@ -89,7 +89,7 @@ $(document).ready(function() {
                 if (response.success) {
                     $('#createGallery').modal('hide'); // Tutup modal tambah
                     $('#formTambahGallery')[0].reset();
-                    $('#gallery-preview').attr('src', '').addClass('d-none');
+                    $('#preview').attr('src', '').addClass('d-none');
                     $('#icon-placeholder').removeClass('d-none');
 
                     loadGalleries();
@@ -97,8 +97,23 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                showToast('Gagal mengunggah foto.', 'danger');
+                
+                let errorMsg = 'Gagal menyimpan data.';
+                
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    let errors = xhr.responseJSON.errors;
+                    let firstKey = Object.keys(errors)[0];
+                    errorMsg = errors[firstKey][0];
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                showToast(errorMsg, 'danger');
                 console.log(xhr.responseJSON);
+
+                $('#formTambahMenu').find('input[type="file"]').val('');
+                $('#preview').addClass('d-none');
+                $('#icon-placeholder').removeClass('d-none');
             },
             complete: function() {
                 $submitBtn.prop('disabled', false).text('Upload Now');
@@ -114,7 +129,6 @@ $(document).ready(function() {
         // Ambil ID dari atribut tombol baris tabel, lalu simpan ke variabel global
         targetGalleryId = $(this).data('id');
         
-        // Perintahkan Bootstrap untuk memunculkan modal hapus yang ada di Blade cukk!
         $('#deleteGalleryModal').modal('show');
     });
 

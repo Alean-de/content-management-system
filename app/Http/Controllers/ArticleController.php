@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Article;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
 {
@@ -42,11 +43,23 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required'],
-            'thumbnail' => ['nullable', 'image']
+            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=16/9']
+        ], [
+            'thumbnail.dimensions' => 'Gunakan foto dengan aspek rasio 16:9',
+            'thumbnail.max'        => 'Ukuran maksimal 2MB',
+            'thumbnail.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'thumbnail.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
@@ -70,10 +83,23 @@ class ArticleController extends Controller
 
     public function updateArticle(Request $request, Article $article)
     {
-         $request->validate([
+        $validator = Validator::make($request->all(), [
         'title' => ['required'],
-        'content' => ['required']
+        'content' => ['required'],
+        'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=16/9']
+        ], [
+            'thumbnail.dimensions' => 'Gunakan foto dengan aspek rasio 16:9',
+            'thumbnail.max'        => 'Ukuran maksimal 2MB',
+            'thumbnail.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'thumbnail.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $thumbnailPath = $article->thumbnail;
 

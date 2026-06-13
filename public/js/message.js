@@ -52,20 +52,15 @@ function loadMessages(page = 1, search = '') {
                 let rowHtml = `
                     <tr data-id="${message.id}" 
                         data-name="${message.name}" 
-                        data-email="${message.email}" 
+                        data-whatsapp="${message.whatsapp}" 
                         data-subject="${message.subject}" 
                         data-message="${message.message}" 
                         data-date="${formattedDate}">
                         <td>${rowNumber}</td>
-                        <td class="fw-bold text-dark">${message.name}</td>
-                        <td class="text-start">${message.email}</td>
+                        <td class="text-start fw-bold text-body">${message.name}</td>
+                        <td class="text-start">${message.whatsapp}</td>
                         <td class="text-start text-muted fw-medium">${message.subject}</td>
                         <td>${formattedDate}</td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm btn-delete px-2.5 py-1 rounded-3" data-id="${message.id}">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </td>
                     </tr>
                 `;
                 $tableBody.append(rowHtml);
@@ -116,7 +111,7 @@ $('#messageTableBody').on('click', 'tr :not(button, i)', function() {
     
     // Tarik data dari baris tr, lalu suntik langsung ke modal detail pembaca
     $('#msg-name').text($row.data('name'));
-    $('#msg-email').text($row.data('email'));
+    $('#msg-whatsapp').text($row.data('whatsapp'));
     $('#msg-subject').text($row.data('subject'));
     $('#msg-content').text($row.data('message'));
     $('#msg-date').text($row.data('date'));

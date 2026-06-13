@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage; 
 use App\Models\Gallery;
+use Illuminate\Support\Facades\Validator;
 
 class GalleryController extends Controller
 {
@@ -24,10 +25,22 @@ class GalleryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required'],
-            'image' => ['required', 'image']
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048', 'dimensions:ratio=4/3']
+        ], [
+            'image.dimensions' => 'Gunakan foto dengan aspek rasio 4:3',
+            'image.max'        => 'Ukuran maksimal 2MB',
+            'image.mimes'      => 'Gagal! Format file wajib berupa JPEG, PNG, atau JPG.',
+            'image.image'      => 'Gagal! File yang kamu unggah bukan berupa gambar.'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $imagePath = $request->file('image')->store('gallery', 'public');
 
