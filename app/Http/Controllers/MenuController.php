@@ -6,9 +6,9 @@ use App\Models\Menu;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class MenuController extends Controller
 {
@@ -84,7 +84,7 @@ class MenuController extends Controller
         $imagePath = null;
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('menu-items', 'public');
+            $imagePath = $this->uploadImage($request->file('image'), 'menu-items');
         }
 
         $menu = Menu::create([
@@ -93,7 +93,7 @@ class MenuController extends Controller
             'description' => $request->description,
             'price'       => $price,
             'image'       => $imagePath,
-            'is_featured' => $request->is_featured // Ambil dari hasil merge di atas
+            'is_featured' => $request->is_featured
         ]);
 
         return response()->json([
@@ -103,7 +103,6 @@ class MenuController extends Controller
         ], 200);
     }
 
-    // 4. Memperbarui Data Menu
     public function updateMenu(Request $request, Menu $menuItem): JsonResponse
     {
         // Validasi input (image diatur nullable karena boleh tidak diganti)
@@ -128,16 +127,14 @@ class MenuController extends Controller
         }
 
         $price = str_replace('.', '', $request->price);
-        $imagePath = $menuItem->image; // Default pakai path gambar lama
+        $imagePath = $menuItem->image;
 
-        // Jika user mengunggah gambar baru
         if ($request->hasFile('image')) {
-            // Hapus berkas gambar lama dari storage agar berkas sampah tidak menumpuk
             if ($menuItem->image && Storage::disk('public')->exists($menuItem->image)) {
                 Storage::disk('public')->delete($menuItem->image);
             }
-            // Simpan gambar baru
-            $imagePath = $request->file('image')->store('menu-items', 'public');
+
+            $imagePath = $this->uploadImage($request->file('image'), 'menu-items');
         }
 
         // Perbarui record di database
@@ -159,17 +156,24 @@ class MenuController extends Controller
     // 5. Menghapus Data Menu
     public function delete(Menu $menuItems): JsonResponse
     {
-        // Hapus fisik file gambar dari storage sebelum menghapus record database
         if ($menuItems->image && Storage::disk('public')->exists($menuItems->image)) {
             Storage::disk('public')->delete($menuItems->image);
         }
 
-        // Hapus data dari database
         $menuItems->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Menu Berhasil Dihapus'
         ]);
+    }
+
+    private function uploadImage($file, string $folder): string
+    {
+        $extension = $file->getClientOriginalExtension();
+        $filename = Str::random(16) . '_' . time() . '.' . $extension;
+        $file->storeAs($folder, $filename, 'public');
+
+        return $folder . '/' . $filename;
     }
 }

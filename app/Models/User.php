@@ -104,7 +104,7 @@ class User extends Authenticatable
         return $query->where('status', self::STATUS_APPROVED);
     }
 
-    public function scoperRejected(Builder $query): Builder
+    public function scopeRejected(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_REJECTED);
     }

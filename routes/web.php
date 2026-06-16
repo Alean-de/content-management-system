@@ -47,11 +47,11 @@ Route::prefix('administrator')->middleware(['auth', 'approved'])->name('administ
     });
 
     // OWNER + ADMIN - Content Management
-    Route::middleware('role:owner, admin')->group(function () {
+    Route::middleware('role:owner,admin')->group(function () {
     
         // Menu Management
         Route::prefix('menu')->name('menu.')->group(function () {
-            Route::get('/', [MenuController::class, 'index']);
+            Route::get('/', [MenuController::class, 'index'])->name('index');
             Route::post('/create/', [MenuController::class, 'store'])->name('store');
             Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
             Route::delete('/delete/{menuItems}', [MenuController::class, 'delete'])->name('delete');
@@ -59,7 +59,7 @@ Route::prefix('administrator')->middleware(['auth', 'approved'])->name('administ
 
         // Article Management
         Route::prefix('article')->name('article.')->group(function () {
-            Route::get('/', [ArticleController::class, 'index']);
+            Route::get('/', [ArticleController::class, 'index'])->name('index');
             Route::post('/create', [ArticleController::class, 'store'])->name('store');
             Route::put('/update/{article}', [ArticleController::class, 'updateArticle'])->name('update');
             Route::delete('/delete/{article}', [ArticleController::class, 'delete'])->name('delete');
@@ -67,7 +67,7 @@ Route::prefix('administrator')->middleware(['auth', 'approved'])->name('administ
 
         // Banner Management
         Route::prefix('banner')->name('banner.')->group(function () {
-            Route::get('/', [BannerController::class, 'index']);
+            Route::get('/', [BannerController::class, 'index'])->name('index');
             Route::post('/create', [BannerController::class, 'store'])->name('store');
             Route::put('/update/{banner}', [BannerController::class, 'updateBanner'])->name('update');
             Route::delete('/delete/{banner}', [BannerController::class, 'delete'])->name('delete');
@@ -75,21 +75,21 @@ Route::prefix('administrator')->middleware(['auth', 'approved'])->name('administ
 
         // Gallery Management
         Route::prefix('gallery')->name('gallery.')->group(function () {
-            Route::get('/', [GalleryController::class, 'index']);
+            Route::get('/', [GalleryController::class, 'index'])->name('index');
             Route::post('/create', [GalleryController::class, 'store'])->name('store');
             Route::delete('/delete/{gallery}', [GalleryController::class, 'delete'])->name('delete');
         });
 
         // Message Management
         Route::prefix('message')->name('message.')->group(function () {
-            Route::get('/', [MessagesController::class, 'index']);
+            Route::get('/', [MessagesController::class, 'index'])->name('index');
             Route::post('/create', [MessagesController::class, 'store'])->name('store');
             Route::delete('/delete/{message}', [MessagesController::class, 'delete'])->name('delete');
         });
 
         // Profile Management
         Route::prefix('profile')->name('profile.')->group(function () {
-            Route::get('/', [ProfileController::class, 'index']);
+            Route::get('/', [ProfileController::class, 'index'])->name('index');
             Route::put('/update/name', [ProfileController::class, 'updateName'])->name('name');
             Route::put('/update/pass', [ProfileController::class, 'updatePassword'])->name('password');
             Route::put('/update/email', [ProfileController::class, 'updateEmail'])->name('email');

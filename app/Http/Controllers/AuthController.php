@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -36,17 +38,48 @@ class AuthController extends Controller
             'password' => ['required']
         ]);
 
-        $fieldType = filter_var($request->identity, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+        $throttleKey = Str::lower($request->identity) . '|' . $request->ip();
 
-        if (Auth::attempt([$fieldType => $request->identity, 'password' => $request->password])) {
-            $request->session()->regenerate();
+        if(RateLimiter::tooManyAttempts($throttleKey, maxAttempts: 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
 
-            return redirect()->route('administrator.dashboard');
+            return back()->withErrors([
+                'identity'  =>  "Terlalu banyak percobaan login. coba lagi dalam {$minutes} menit."
+            ])->withInput($request->only('identity'));
         }
 
-        return back()->withErrors([
-            'identity' => 'Kredensial yang anda masukkan tidak cocok'
-        ]);
+        $fieldType = filter_var($request->identity, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+
+        $user = User::where($fieldType, $request->identity)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($throttleKey, 300);
+
+            $remaining = RateLimiter::remaining($throttleKey, maxAttempts: 5);
+
+            return back()->withErrors([
+                'identity' => "Kredensial yang anda masukkan tidak cocok. Sisa percobaan: {$remaining}x"
+            ])->withInput($request->only('identity'));
+        }
+
+        if($user->isPending()) {
+            return back()->withErrors([
+                'identity'  =>  'Akun anda sedang menunggu persetujuan dari Owner.'
+            ])->withInput($request->only('identity'));
+        }
+
+        if($user->isRejected()) {
+            return back()->withErrors([
+                'identity'  =>  'Akun anda ditolak. Silahkan hubungi Owner untuk informasi lebih lanjut.'
+            ])->withInput($request->only('identity'));
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        RateLimiter::clear($throttleKey);
+        $request->session()->regenerate();
+
+        return redirect()->route('administrator.dashboard');
     }
 
     public function register(Request $request)
@@ -57,14 +90,16 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:6', 'max:10', 'confirmed'],
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'role'  =>  User::ROLE_ADMIN,
+            'status'    =>  User::STATUS_PENDING  
         ]);
 
-        Auth::login($user);
-        return redirect()->route('administrator.dashboard');
+        return redirect()->route('login')
+            ->with('info', 'Registrasi Berhasil. Akun anda sedang menunggu persetujuan dari Owner.');
     }
 
     public function logout(Request $request)
