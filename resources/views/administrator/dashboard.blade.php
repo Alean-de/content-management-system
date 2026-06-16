@@ -89,7 +89,7 @@
             <div class="card border-0 shadow-sm rounded-3 bg-body h-100">
                 <div class="card-header bg-body border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold text-body m-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Recent Messages</h6>
-                    <a href="{{ route('administrator.message.') }}" class="text-primary text-decoration-none small fw-semibold" style="font-size: 12px;">View All</a>
+                    <a href="{{ route('administrator.message.index') }}" class="text-primary text-decoration-none small fw-semibold" style="font-size: 12px;">View All</a>
                 </div>
                 <div class="card-body px-4 pb-4 pt-1">
                     <div class="table-responsive">

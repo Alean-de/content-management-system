@@ -9,9 +9,12 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserApprovalController;
 
+// Public Page
 Route::get('/', [PublicController::class, 'index'])->name('index');
 
+// ADMINISTRATOR - GUEST ONLY
 Route::prefix('administrator')->middleware('guest')->group(function (){
 
     //  Login
@@ -28,61 +31,75 @@ Route::prefix('administrator')->middleware('guest')->group(function (){
 
 }); 
 
-Route::prefix('administrator')->middleware('auth')->name('administrator.')->group(function () {
+// ADMINISTRATOR - AUTH + APPROVED
+Route::prefix('administrator')->middleware(['auth', 'approved'])->name('administrator.')->group(function () {
     
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
-
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Menu Management
-    Route::prefix('menu')->name('menu.')->group(function () {
-        Route::get('/', [MenuController::class, 'index']);
-        Route::post('/create/', [MenuController::class, 'store'])->name('store');
-        Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
-        Route::delete('/delete/{menuItems}', [MenuController::class, 'delete'])->name('delete');
+    // OWNER ONLY
+    Route::middleware('role:owner')->prefix('users')->name('users.')->group(function () { 
+        Route::get('/', [UserApprovalController::class, 'index'])->name('index');
+        Route::get('/{user}', [UserApprovalController::class, 'show'])->name('show');
+        Route::patch('/{user}/approve', [UserApprovalController::class, 'approve'])->name('approve');
+        Route::patch('/{user}/reject', [UserApprovalController::class, 'reject'])->name('reject');
+        Route::delete('/{user}', [UserApprovalController::class, 'destroy'])->name('destroy');
     });
 
-    // Article Management
-    Route::prefix('article')->name('article.')->group(function () {
-        Route::get('/', [ArticleController::class, 'index']);
-        Route::post('/create', [ArticleController::class, 'store'])->name('store');
-        Route::put('/update/{article}', [ArticleController::class, 'updateArticle'])->name('update');
-        Route::delete('/delete/{article}', [ArticleController::class, 'delete'])->name('delete');
+    // OWNER + ADMIN - Content Management
+    Route::middleware('role:owner,admin')->group(function () {
+    
+        // Menu Management
+        Route::prefix('menu')->name('menu.')->group(function () {
+            Route::get('/', [MenuController::class, 'index'])->name('index');
+            Route::post('/create/', [MenuController::class, 'store'])->name('store');
+            Route::put('/update/{menuItem}', [MenuController::class, 'updateMenu'])->name('update');
+            Route::delete('/delete/{menuItems}', [MenuController::class, 'delete'])->name('delete');
+        });
+
+        // Article Management
+        Route::prefix('article')->name('article.')->group(function () {
+            Route::get('/', [ArticleController::class, 'index'])->name('index');
+            Route::post('/create', [ArticleController::class, 'store'])->name('store');
+            Route::put('/update/{article}', [ArticleController::class, 'updateArticle'])->name('update');
+            Route::delete('/delete/{article}', [ArticleController::class, 'delete'])->name('delete');
+        });
+
+        // Banner Management
+        Route::prefix('banner')->name('banner.')->group(function () {
+            Route::get('/', [BannerController::class, 'index'])->name('index');
+            Route::post('/create', [BannerController::class, 'store'])->name('store');
+            Route::put('/update/{banner}', [BannerController::class, 'updateBanner'])->name('update');
+            Route::delete('/delete/{banner}', [BannerController::class, 'delete'])->name('delete');
+        });
+
+        // Gallery Management
+        Route::prefix('gallery')->name('gallery.')->group(function () {
+            Route::get('/', [GalleryController::class, 'index'])->name('index');
+            Route::post('/create', [GalleryController::class, 'store'])->name('store');
+            Route::delete('/delete/{gallery}', [GalleryController::class, 'delete'])->name('delete');
+        });
+
+        // Message Management
+        Route::prefix('message')->name('message.')->group(function () {
+            Route::get('/', [MessagesController::class, 'index'])->name('index');
+            Route::post('/create', [MessagesController::class, 'store'])->name('store');
+            Route::delete('/delete/{message}', [MessagesController::class, 'delete'])->name('delete');
+        });
+
+        // Profile Management
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'index'])->name('index');
+            Route::put('/update/name', [ProfileController::class, 'updateName'])->name('name');
+            Route::put('/update/pass', [ProfileController::class, 'updatePassword'])->name('password');
+            Route::put('/update/email', [ProfileController::class, 'updateEmail'])->name('email');
+        });
+
     });
 
-    // Banner Management
-    Route::prefix('banner')->name('banner.')->group(function () {
-        Route::get('/', [BannerController::class, 'index']);
-        Route::post('/create', [BannerController::class, 'store'])->name('store');
-        Route::put('/update/{banner}', [BannerController::class, 'updateBanner'])->name('update');
-        Route::delete('/delete/{banner}', [BannerController::class, 'delete'])->name('delete');
-    });
-
-    // Gallery Management
-    Route::prefix('gallery')->name('gallery.')->group(function () {
-        Route::get('/', [GalleryController::class, 'index']);
-        Route::post('/create', [GalleryController::class, 'store'])->name('store');
-        Route::delete('/delete/{gallery}', [GalleryController::class, 'delete'])->name('delete');
-    });
-
-    // Message Management
-    Route::prefix('message')->name('message.')->group(function () {
-        Route::get('/', [MessagesController::class, 'index']);
-        Route::post('/create', [MessagesController::class, 'store'])->name('store');
-        Route::delete('/delete/{message}', [MessagesController::class, 'delete'])->name('delete');
-    });
-
-    // Profile Management
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'index']);
-        Route::put('/update/name', [ProfileController::class, 'updateName'])->name('name');
-        Route::put('/update/pass', [ProfileController::class, 'updatePassword'])->name('password');
-        Route::put('/update/email', [ProfileController::class, 'updateEmail'])->name('email');
-    });
- 
 });
 
-
+// PUBLIC PAGES
 Route::prefix('public')->name('public.')->group(function () {
     
     Route::get('/about-us', [PublicController::class, 'aboutUs'])->name('aboutUs');

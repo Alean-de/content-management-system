@@ -24,42 +24,49 @@
             
             <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*menu*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.menu.') }}">
+                   href="{{ route('administrator.menu.index') }}">
                    Menu
                 </a>
             </li>
             
             <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*article*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.article.') }}">
+                   href="{{ route('administrator.article.index') }}">
                    Article
                 </a>
             </li>
             
             <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*banner*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.banner.') }}">
+                   href="{{ route('administrator.banner.index') }}">
                    Banner
                 </a>
             </li>
             
             <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*gallery*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.gallery.') }}">
+                   href="{{ route('administrator.gallery.index') }}">
                    Gallery
                 </a>
             </li>
             
             <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*message*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.message.') }}">
+                   href="{{ route('administrator.message.index') }}">
                    Message
                 </a>
             </li>
             
             <li class="nav-item">
+                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*users*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
+                   href="{{ route('administrator.users.index') }}">
+                   Users
+                </a>
+            </li>
+            
+            <li class="nav-item">
                 <a class="nav-link px-3 py-2 rounded-3 fw-medium text-body {{ Request::is('*profile*') ? 'active bg-primary bg-opacity-10 text-primary' : '' }}" 
-                   href="{{ route('administrator.profile.') }}">
+                   href="{{ route('administrator.profile.index') }}">
                    Profile
                 </a>
             </li>
